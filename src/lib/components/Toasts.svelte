@@ -1,11 +1,22 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import type { Toast } from '$lib';
 	const { toasts }: { toasts: Toast[] } = $props();
+
+	function setClassess(type: string) {
+		return `alert alert-${type}`;
+	}
 </script>
 
 {#snippet tost(toast: Toast)}
-	<div out:fade class={`alert alert-${toast.type}`}>
+	<div
+		role="alert"
+		out:fade
+		class="alert"
+		class:alert-info={toast.type === 'info'}
+		class:alert-success={toast.type === 'success'}
+		class:alert-error={toast.type === 'danger'}
+	>
 		<span>{toast.content}</span>
 	</div>
 {/snippet}

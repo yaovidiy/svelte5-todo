@@ -25,7 +25,7 @@
 		if (dbTodos.length) {
 			showToast({ type: 'success', content: 'We haved loaded previosly saved Todo list for you' });
 		} else {
-			showToast({ type: 'info', content: 'There was no saved Todo list in this browser' });
+			showToast({ type: 'danger', content: 'There was no saved Todo list in this browser' });
 		}
 		todos = dbTodos;
 		savedInDbTodos = dbTodos;
@@ -60,7 +60,7 @@
 
 		await loadFromDB();
 		saving = false;
-		showToast({ type: 'success', content: 'You have saved current Todo list to the DB' });
+		showToast({ type: 'success', content: 'Saved current Todo list to the DB' });
 	}
 
 	onMount(async () => {
@@ -82,6 +82,7 @@
 	async function deleteTodo(todoId: number) {
 		todos = todos.filter(({ id }) => id !== todoId);
 		await db.todos.delete(todoId);
+		await loadFromDB();
 
 		showToast({ type: 'success', content: 'You have deleted todo item!' });
 	}
@@ -114,15 +115,19 @@
 
 	$effect(() => {
 		if (todos.length !== savedInDbTodos.length) {
-			if (interval) {
+			saveOnChanged()
+		}
+	});
+
+	function saveOnChanged() {
+		if (interval) {
 				clearTimeout(interval);
 			}
 
 			interval = setTimeout(() => {
 				saveToDB();
 			}, 2000);
-		}
-	});
+	}
 
 	function handleInputKeydown(e: KeyboardEvent) {
 		if (e.code === 'Enter') {
@@ -134,7 +139,7 @@
 {#snippet listOption(data: TODO)}
 	<li class="form-control w-full">
 		<label class="label cursor-pointer">
-			<input type="checkbox" bind:checked={data.done} class="checkbox checkbox-primary" />
+			<input type="checkbox" bind:checked={data.done} onchange={saveOnChanged} class="checkbox checkbox-primary" />
 			<h3>{data.name}</h3>
 
 			<button class="btn btn-square btn-primary" onclick={() => deleteTodo(data.id)}>
