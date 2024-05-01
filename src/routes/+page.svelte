@@ -52,86 +52,54 @@
 
 		newTodoName = '';
 	}
+
+	let isDarkMode = $state(true);
+
+	$effect(() => {
+		if (isDarkMode) {
+			document.documentElement.dataset.theme = 'night';
+			return;
+		}
+
+		document.documentElement.dataset.theme = 'nordemerald';
+	});
 </script>
 
-{#snippet listOptionDone(data: TODO)}
-	<li class="list-option__done">
-		<label>
-			<input type="checkbox" bind:checked={data.done} />
-			<span>{data.name}</span>
-		</label>
-	</li>
-{/snippet}
-{#snippet listOptionNotDone(data: TODO)}
-	<li class="list-option__not-done">
-		<label>
-			<input type="checkbox" bind:checked={data.done} />
-			<span>{data.name}</span>
+{#snippet listOption(data: TODO)}
+	<li class="form-control">
+		<label class="label cursor-pointer">
+			<input type="checkbox" bind:checked={data.done} class="checkbox checkbox-primary" />
+			<span class="label-text">{data.name}</span>
 		</label>
 	</li>
 {/snippet}
 
-<section class="container">
-	<div class="row">
-		<div class="col col-12">
-			<input class="input" type="text" bind:value={newTodoName} />
-			<button class="btn btn-primary" onclick={addTodo}>Add todo</button>
-			<button class="btn btn-secondary" onclick={saveToDB} disabled={!canSave && !saving}
-				>{saving ? 'Saving...' : 'Saved to DB'}</button
-			>
-			<button class="btn btn-secondary" onclick={loadFromDB} disabled={!canLoad && !saving}
-				>{saving ? 'Loading...' : 'Load from DB'}</button
-			>
-		</div>
-		{#if todos.length}
-			<div class="col col-12 col-md-6">
-				<h1>TODO</h1>
-				<ul class="list">
-					{#each notDone as todo}
-						{@render listOptionNotDone(todo)}
-					{/each}
-				</ul>
-			</div>
-			<div class="col col-12 col-md-6">
-				<h1>Done</h1>
-				<ul class="list">
-					{#each done as todo}
-						{@render listOptionDone(todo)}
-					{/each}
-				</ul>
-			</div>
-		{/if}
+<input type="checkbox" class="toggle" bind:checked={isDarkMode} />
+
+<section class="flex flex-col">
+	<div class="col col-12">
+		<input class="input input-bordered w-full max-w-xs" placeholder="Enter todo item" type="text" bind:value={newTodoName} />
+		<button class="btn btn-secondary" onclick={saveToDB} disabled={!canSave && !saving}
+			>{saving ? 'Saving...' : 'Save to DB'}</button
+		>
 	</div>
+	{#if todos.length}
+		<div class="col col-12 col-md-6">
+			<h1>TODO</h1>
+			<ul class="list">
+				{#each notDone as todo}
+					{@render listOption(todo)}
+				{/each}
+			</ul>
+		</div>
+		<div class="col col-12 col-md-6">
+			<h1>Done</h1>
+			<ul class="list">
+				{#each done as todo}
+					{@render listOption(todo)}
+				{/each}
+			</ul>
+		</div>
+		
+	{/if}
 </section>
-
-<style>
-	.container {
-		max-width: 1200px;
-		margin-inline: auto;
-	}
-
-	.row {
-		display: flex;
-		flex-wrap: wrap;
-	}
-
-	.col {
-		flex: 0 0 auto;
-	}
-
-	.col-12 {
-		flex-basis: 100%;
-	}
-
-	.list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-
-	@media (min-width: 600px) {
-		.col-md-6 {
-			flex-basis: 50%;
-		}
-	}
-</style>
