@@ -1,32 +1,32 @@
 import type { Snippet } from "svelte";
 
 class ModalControler {
-  modalContent: Snippet | null = $state(null);
-  modalHeader: Snippet | null = $state(null);
-  modalFooter: Snippet | null = $state(null);
-  modalProps: Record<string, unknown> = {};
-  isModalOpen = $state(false);
+  content: Snippet | null = $state(null);
+  header: Snippet | null = $state(null);
+  footer: Snippet | null = $state(null);
+  props: Record<string, unknown> = {};
+  isOpen = $state(false);
 
-  openModal({ content, header, footer }: { content: Snippet; header?: Snippet; footer?: Snippet; }, props: Record<string, unknown> = {}) {
+  open({ content, header, footer }: { content: Snippet; header?: Snippet; footer?: Snippet; }, props: Record<string, unknown> = {}) {
     if (!content) {
       throw new Error('Content is required');
     }
 
     console.log('openModal', content, header, footer, props);
 
-    this.modalContent = content;
-    this.modalHeader = header ?? null;
-    this.modalFooter = footer ?? null;
+    this.content = content;
+    this.header = header ?? null;
+    this.footer = footer ?? null;
 
-    this.modalProps = props;
-    this.isModalOpen = true;
+    this.props = props;
+    this.isOpen = true;
   }
 
-  closeModal() {
-    this.isModalOpen = false;
-    this.modalContent = null;
-    this.modalHeader = null;
-    this.modalFooter = null;
+  close() {
+    this.isOpen = false;
+    this.content = null;
+    this.header = null;
+    this.footer = null;
   }
 }
 

@@ -1,12 +1,12 @@
 import Dexie, { type Table } from "dexie";
 
 export interface TODO {
-  id: number,
+  id?: number,
   name: string,
   done: boolean,
   createdAt?: number,
   labels?: string[],
-  deadline?: number,
+  deadline?: number | string,
 }
 
 export class DexieExtension extends Dexie {

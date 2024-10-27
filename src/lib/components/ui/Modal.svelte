@@ -4,7 +4,7 @@
 	let dialogElement: HTMLDialogElement | null = $state(null);
 
 	$effect(() => {
-		if (modal.isModalOpen) {
+		if (modal.isOpen) {
 			dialogElement?.showModal();
 		} else {
 			dialogElement?.close();
@@ -12,18 +12,18 @@
 	});
 </script>
 
-<dialog onclose={() => (modal.isModalOpen = false)} bind:this={dialogElement} class="modal">
+<dialog onclose={() => (modal.isOpen = false)} bind:this={dialogElement} class="modal">
 	<div class="modal-box">
-		{#if modal.modalHeader}
-			{@render modal.modalHeader()}
+		{#if modal.header}
+			{@render modal.header()}
 		{/if}
-		{#if modal.modalContent}
-			{@render modal.modalContent()}
+		{#if modal.content}
+			{@render modal.content()}
 		{:else}
 			<p>Modal content is not provided</p>
 		{/if}
-		{#if modal.modalFooter}
-			{@render modal.modalFooter()}
+		{#if modal.footer}
+			{@render modal.footer()}
 		{/if}
 	</div>
 	<form method="dialog" class="modal-backdrop">

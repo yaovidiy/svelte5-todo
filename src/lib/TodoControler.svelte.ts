@@ -24,12 +24,27 @@ class TodoControler {
     }
   }
 
-  add(todoName: string) {
+  add(todoData: string | TODO) {
+    if (typeof todoData === 'string' && todoData.trim() === '') {
+      toast.add({ type: 'danger', content: 'Todo name is required' });
+      return;
+    }
+
+    let deadline = 0;
+    if (typeof todoData !== 'string' && todoData.deadline) {
+      deadline = new Date(todoData.deadline).getTime();
+
+      if (deadline < Date.now()) {
+        toast.add({ type: 'danger', content: 'Deadline is invalid' });
+        return;
+      }
+    }
     const todo: TODO = {
       id: Math.random(),
-      name: todoName,
+      name: typeof todoData === 'string' ? todoData : todoData.name,
       done: false,
       createdAt: Date.now(),
+      deadline,
     };
 
     this.items = [...this.items, todo];

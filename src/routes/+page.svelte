@@ -5,12 +5,20 @@
 	import type { TODO } from '$lib/db';
 
 	let newTodoName = $state<string>('');
+	let todoItem: TODO = $state({ name: '', done: false, deadline: 0, labels: [] });
 
 	function handleInputKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			todo.add(newTodoName);
 			newTodoName = '';
 		}
+	}
+
+	function handleAddTodo() {
+		todo.add(todoItem);
+
+		todoItem = { name: '', done: false, deadline: 0, labels: [] };
+		modal.close();
 	}
 
 	onMount(async () => {
@@ -32,7 +40,7 @@
 			<button
 				aria-label="Remove item"
 				class="btn btn-square btn-primary"
-				onclick={() => todo.remove(data.id)}
+				onclick={() => todo.remove(data?.id ?? 0)}
 			>
 				<svg
 					width="24"
@@ -63,8 +71,37 @@
 {/snippet}
 
 {#snippet modalContent()}
-	<h3 class="text-lg font-bold">Hi there!</h3>
-	<p class="py-4">You opened the modal!</p>
+	<h3 class="text-xl text-center pb-4 mb-4 border-b">Add new todo item</h3>
+	<div class="grid gap-5 grid-cols-1 md:grid-cols-2">
+		<label class="form-control w-full max-w-xs">
+			<div class="label">
+				<span class="label-text">Todo Item Description</span>
+			</div>
+			<input
+				class="input input-bordered w-full max-w-xs"
+				placeholder="Enter todo item"
+				type="text"
+				onkeydown={handleInputKeydown}
+				bind:value={todoItem.name}
+			/>
+		</label>
+
+		<label class="form-control w-full max-w-xs">
+			<div class="label">
+				<span class="label-text">Todo Item Deadline</span>
+			</div>
+			<input
+				class="input input-bordered w-full max-w-xs"
+				type="date"
+				placeholder="select deadline date"
+				bind:value={todoItem.deadline}
+			/>
+		</label>
+
+		<button onclick={handleAddTodo} class="btn btn-primary col-span-2 text-base font-semibold"
+			>Add</button
+		>
+	</div>
 {/snippet}
 
 <section class="flex flex-col">
@@ -76,6 +113,7 @@
 			onkeydown={handleInputKeydown}
 			bind:value={newTodoName}
 		/>
+		<button onclick={() => modal.open({ content: modalContent })}>Show extended params</button>
 	</div>
 	<div class="flex justify-center gap-4 p-4">
 		{#if todo.items.length && !todo.isLoading}
@@ -101,5 +139,4 @@
 			<h2 class="text-center">No Todo Items added!</h2>
 		{/if}
 	</div>
-
 </section>
