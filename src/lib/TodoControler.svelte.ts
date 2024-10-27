@@ -8,7 +8,7 @@ class TodoControler {
   selectedItem: TODO | null = $state(null);
   isLoading = $state(false);
   autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
-  autoSaveTimeoutTime = 1000;
+  autoSaveTimeoutTime = 3000;
 
   setTodos(todos: TODO[]) {
     this.items = todos;
@@ -63,14 +63,7 @@ class TodoControler {
     this.autoSaveToDB();
   }
 
-  toggleDone(id: number) {
-    this.items = this.items.map((t) => {
-      if (t.id === id) {
-        t.done = !t.done;
-      }
-      return t;
-    });
-
+  toggleDone() {
     toast.add({ type: 'success', content: 'Todo is done' });
 
     this.autoSaveToDB();
@@ -82,9 +75,7 @@ class TodoControler {
     }
 
     this.autoSaveTimeout = setTimeout(async () => {
-      this.isLoading = true;
       await db.todos.bulkPut($state.snapshot(this.items));
-      this.isLoading = false;
       toast.add({ type: 'success', content: 'DB is synced with current state' });
     }, this.autoSaveTimeoutTime);
   }
