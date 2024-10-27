@@ -60,7 +60,7 @@
 	<input
 		type="checkbox"
 		bind:checked={data.done}
-		onchange={() => todo.toggleDone()}
+		onchange={() => todo.toggleDone(data.id!)}
 		class="checkbox checkbox-primary"
 	/>
 	<h3 class={data.done ? 'line-through' : ''}>{data.name}</h3>
