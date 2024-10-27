@@ -25,7 +25,7 @@ class TodoControler {
   }
 
   add(todoData: string | TODO) {
-    if (typeof todoData === 'string' && todoData.trim() === '') {
+    if (typeof todoData === 'string' && todoData.trim() === '' || typeof todoData !== 'string' && todoData.name.trim() === '') {
       toast.add({ type: 'danger', content: 'Todo name is required' });
       return;
     }
@@ -90,8 +90,13 @@ class TodoControler {
     }
 
     this.autoSaveTimeout = setTimeout(async () => {
-      await db.todos.bulkPut($state.snapshot(this.items));
-      toast.add({ type: 'success', content: 'DB is synced with current state' });
+      try {
+        await db.todos.bulkPut($state.snapshot(this.items));
+        toast.add({ type: 'success', content: 'DB is synced with current state' });
+      } catch (e) {
+        console.error(e);
+        toast.add({ type: 'danger', content: 'Error while saving to DB' });
+      }
     }, this.autoSaveTimeoutTime);
   }
 }
