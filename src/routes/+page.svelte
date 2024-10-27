@@ -24,7 +24,7 @@
 			<input
 				type="checkbox"
 				bind:checked={data.done}
-				onchange={() => todo.toggleDone(data.id)}
+				onchange={() => todo.toggleDone()}
 				class="checkbox checkbox-primary"
 			/>
 			<h3>{data.name}</h3>
