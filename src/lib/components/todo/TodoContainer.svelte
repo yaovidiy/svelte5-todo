@@ -4,9 +4,12 @@
 	import { modal } from '$lib/ModalControler.svelte';
 	import type { TODO } from '$lib/db';
 	import TodoItem from './TodoItem.svelte';
+	import { crossfade } from 'svelte/transition';
 
 	let newTodoName = $state<string>('');
 	let todoItem: TODO = $state({ name: '', done: false, deadline: 0, labels: [] });
+
+	const [send, receive] = crossfade({});
 
 	function handleInputKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
@@ -77,16 +80,28 @@
 			<div class="mt-10 w-full md:w-1/2">
 				<h2 class="text-center">TODO</h2>
 				<ul class="w-full">
-					{#each todo.unDoneItems as undone}
-						<TodoItem data={undone} />
+					{#each todo.unDoneItems as undone (undone.id)}
+						<li
+							class="form-control w-full"
+							in:receive={{ key: undone.id }}
+							out:send={{ key: undone.id }}
+						>
+							<TodoItem data={undone} />
+						</li>
 					{/each}
 				</ul>
 			</div>
 			<div class="mt-10 w-full md:w-1/2">
 				<h2 class="text-center">Done</h2>
 				<ul class="list">
-					{#each todo.doneItems as done}
-						<TodoItem data={done} />
+					{#each todo.doneItems as done (done.id)}
+						<li
+							class="form-control w-full"
+							in:receive={{ key: done.id }}
+							out:send={{ key: done.id }}
+						>
+							<TodoItem data={done} />
+						</li>
 					{/each}
 				</ul>
 			</div>

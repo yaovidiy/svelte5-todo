@@ -56,20 +56,18 @@
 	</div>
 {/snippet}
 
-<li class="form-control w-full">
-	<label class="label cursor-pointer">
-		<input
-			type="checkbox"
-			bind:checked={data.done}
-			onchange={() => todo.toggleDone()}
-			class="checkbox checkbox-primary"
-		/>
-		<h3 class={data.done ? 'line-through' : ''}>{data.name}</h3>
+<label class="label cursor-pointer">
+	<input
+		type="checkbox"
+		bind:checked={data.done}
+		onchange={() => todo.toggleDone()}
+		class="checkbox checkbox-primary"
+	/>
+	<h3 class={data.done ? 'line-through' : ''}>{data.name}</h3>
 
-		<div class="flex justify-center items-center gap-3">
-			<button onclick={() => modal.open({ content: detailsModal })} class="btn btn-info"
-				>Details</button
-			>
-		</div>
-	</label>
-</li>
+	<div class="flex justify-center items-center gap-3">
+		<button onclick={() => modal.open({ content: detailsModal })} class="btn btn-info"
+			>Details</button
+		>
+	</div>
+</label>
