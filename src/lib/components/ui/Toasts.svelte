@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { toast } from '$lib/toastControler.svelte';
 	import type { Toast } from '$lib';
-	const { toasts }: { toasts: Toast[] } = $props();
-
-	function setClassess(type: string) {
-		return `alert alert-${type}`;
-	}
 </script>
 
 {#snippet tost(toast: Toast)}
@@ -22,7 +18,7 @@
 {/snippet}
 
 <div class="toast toast-end">
-	{#each toasts as toast}
-		{@render tost(toast)}
+	{#each toast.toasts as toastItem}
+		{@render tost(toastItem)}
 	{/each}
 </div>

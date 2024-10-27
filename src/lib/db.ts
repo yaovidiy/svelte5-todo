@@ -4,6 +4,9 @@ export interface TODO {
   id: number,
   name: string,
   done: boolean,
+  createdAt?: number,
+  labels?: string[],
+  deadline?: number,
 }
 
 export class DexieExtension extends Dexie {

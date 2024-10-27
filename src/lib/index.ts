@@ -2,4 +2,5 @@
 export interface Toast {
   type: 'success' | 'info' | 'danger';
   content: string;
+  id?: number;
 }

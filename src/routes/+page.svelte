@@ -1,148 +1,39 @@
 <script lang="ts">
-	import db, { type TODO } from '$lib/db';
 	import { onMount } from 'svelte';
-	import type { Toast } from '$lib';
-	import Toasts from '$lib/components/Toasts.svelte';
+	import { todo } from '$lib/TodoControler.svelte';
+	import { modal } from '$lib/ModalControler.svelte';
+	import type { TODO } from '$lib/db';
 
-	let loading = $state(false);
-	let todos = $state<TODO[]>([]);
 	let newTodoName = $state<string>('');
-	let saving = $state<boolean>(false);
-	let toasts = $state<Toast[]>([]);
-	let savedInDbTodos = $state<TODO[]>([]);
-	let done = $derived<TODO[]>(todos.filter((todo) => todo.done));
-	let notDone = $derived<TODO[]>(todos.filter((todo) => !todo.done));
-	let canSave = $derived<boolean>(todos.length > 0);
-	let canLoad = $derived<boolean>(todos.length === 0);
-	let interval: ReturnType<typeof setInterval> = 0;
 
-	async function loadFromDB() {
-		if (!canLoad) {
-			return;
+	function handleInputKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			todo.add(newTodoName);
+			newTodoName = '';
 		}
-		const dbTodos = await db.todos.toArray();
-
-		if (dbTodos.length) {
-			showToast({ type: 'success', content: 'We haved loaded previosly saved Todo list for you' });
-		} else {
-			showToast({ type: 'danger', content: 'There was no saved Todo list in this browser' });
-		}
-		todos = dbTodos;
-		savedInDbTodos = dbTodos;
-	}
-
-	async function saveToDB() {
-		if (!canSave) {
-			return;
-		}
-
-		saving = true;
-		const getDBData = await db.todos.toArray();
-
-		const savePromises: Promise<any>[] = [];
-		todos.forEach((todo) => {
-			if (!getDBData.length) {
-				savePromises.push(db.todos.add({ ...todo }));
-				return;
-			}
-
-			const todoInTheList = getDBData.find((dbTodo) => dbTodo.id === todo.id);
-
-			if (!todoInTheList) {
-				savePromises.push(db.todos.add({ ...todo }));
-				return;
-			}
-
-			savePromises.push(db.todos.update(todo.id, todo));
-		});
-
-		await Promise.allSettled(savePromises);
-
-		await loadFromDB();
-		saving = false;
-		showToast({ type: 'success', content: 'Saved current Todo list to the DB' });
 	}
 
 	onMount(async () => {
-		loading = true;
-		await loadFromDB();
-		loading = false;
+		todo.loadFromDB();
 	});
-
-	function showToast(data: Toast) {
-		toasts.push(data);
-
-		setTimeout(() => {
-			if (toasts.length) {
-				toasts.pop();
-			}
-		}, 2000);
-	}
-
-	async function deleteTodo(todoId: number) {
-		todos = todos.filter(({ id }) => id !== todoId);
-		await db.todos.delete(todoId);
-		await loadFromDB();
-
-		showToast({ type: 'success', content: 'You have deleted todo item!' });
-	}
-
-	function addTodo() {
-		if (newTodoName.trim() === '') {
-			return;
-		}
-		const todo: TODO = {
-			id: Math.random(),
-			done: false,
-			name: newTodoName
-		};
-
-		todos = [...todos, todo];
-
-		newTodoName = '';
-	}
-
-	let isDarkMode = $state(true);
-
-	$effect(() => {
-		if (isDarkMode) {
-			document.documentElement.dataset.theme = 'night';
-			return;
-		}
-
-		document.documentElement.dataset.theme = 'emerald';
-	});
-
-	$effect(() => {
-		if (todos.length !== savedInDbTodos.length) {
-			saveOnChanged()
-		}
-	});
-
-	function saveOnChanged() {
-		if (interval) {
-				clearTimeout(interval);
-			}
-
-			interval = setTimeout(() => {
-				saveToDB();
-			}, 2000);
-	}
-
-	function handleInputKeydown(e: KeyboardEvent) {
-		if (e.code === 'Enter') {
-			addTodo();
-		}
-	}
 </script>
 
 {#snippet listOption(data: TODO)}
 	<li class="form-control w-full">
 		<label class="label cursor-pointer">
-			<input type="checkbox" bind:checked={data.done} onchange={saveOnChanged} class="checkbox checkbox-primary" />
+			<input
+				type="checkbox"
+				bind:checked={data.done}
+				onchange={() => todo.toggleDone(data.id)}
+				class="checkbox checkbox-primary"
+			/>
 			<h3>{data.name}</h3>
 
-			<button class="btn btn-square btn-primary" onclick={() => deleteTodo(data.id)}>
+			<button
+				aria-label="Remove item"
+				class="btn btn-square btn-primary"
+				onclick={() => todo.remove(data.id)}
+			>
 				<svg
 					width="24"
 					height="24"
@@ -171,9 +62,10 @@
 	</li>
 {/snippet}
 
-<div class="flex justify-end">
-	<input type="checkbox" class="toggle mt-4 mr-4" bind:checked={isDarkMode} />
-</div>
+{#snippet modalContent()}
+	<h3 class="text-lg font-bold">Hi there!</h3>
+	<p class="py-4">You opened the modal!</p>
+{/snippet}
 
 <section class="flex flex-col">
 	<div class="flex w-full justify-center items-center mt-10 gap-4">
@@ -186,29 +78,28 @@
 		/>
 	</div>
 	<div class="flex justify-center gap-4 p-4">
-		{#if todos.length && !loading}
+		{#if todo.items.length && !todo.isLoading}
 			<div class="mt-10 w-full md:w-1/2">
 				<h2 class="text-center">TODO</h2>
 				<ul class="w-full">
-					{#each notDone as todo}
-						{@render listOption(todo)}
+					{#each todo.unDoneItems as undone}
+						{@render listOption(undone)}
 					{/each}
 				</ul>
 			</div>
 			<div class="mt-10 w-full md:w-1/2">
 				<h2 class="text-center">Done</h2>
 				<ul class="list">
-					{#each done as todo}
-						{@render listOption(todo)}
+					{#each todo.doneItems as done}
+						{@render listOption(done)}
 					{/each}
 				</ul>
 			</div>
-		{:else if loading}
+		{:else if todo.isLoading}
 			<div class="loading loading-dots loading-lg m-auto"></div>
 		{:else}
 			<h2 class="text-center">No Todo Items added!</h2>
 		{/if}
 	</div>
 
-	<Toasts {toasts} />
 </section>
