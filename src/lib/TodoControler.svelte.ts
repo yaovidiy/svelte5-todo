@@ -61,6 +61,14 @@ class TodoControler {
     toast.add({ type: 'success', content: '❌ Todo removed' });
   }
 
+  async getByDate(date: Date) {
+    if (this.items.length === 0) {
+      await this.loadFromDB();
+    }
+    
+    return this.items.filter((t) => new Date(t.deadline ?? '').toDateString() === date.toDateString());
+  }
+
   select(todo: TODO) {
     this.selectedItem = todo;
   }

@@ -1,28 +1,27 @@
 <script lang="ts">
 	import Cell from './Cell.svelte';
 	import { DateController } from '$lib/DateController.svelte';
-	import { onMount } from 'svelte';
 
 	const date = new DateController();
-	let speechOutput = $state('');
-	let recognition: typeof window.SpeechRecognition | undefined;
+	// let speechOutput = $state('');
+	// let recognition: typeof window.SpeechRecognition | undefined;
 
-	onMount(() => {
-		recognition = new (window?.SpeechRecognition ||
-			window?.webkitSpeechRecognition ||
-			window?.mozSpeechRecognition ||
-			window?.msSpeechRecognition)();
+	// onMount(() => {
+	// 	recognition = new (window?.SpeechRecognition ||
+	// 		window?.webkitSpeechRecognition ||
+	// 		window?.mozSpeechRecognition ||
+	// 		window?.msSpeechRecognition)();
 
-		recognition.lang = 'uk-UA';
+	// 	recognition.lang = 'uk-UA';
 
-		recognition.onresult = (event) => {
-			const transcript = event.results[0][0].transcript;
-			speechOutput = transcript;
-		};
-	});
+	// 	recognition.onresult = (event) => {
+	// 		const transcript = event.results[0][0].transcript;
+	// 		speechOutput = transcript;
+	// 	};
+	// });
 </script>
 
-<button
+<!-- <button
 	onclick={() => {
 		recognition?.start();
 	}}>Start</button
@@ -34,7 +33,7 @@
 	onclick={() => {
 		recognition?.stop();
 	}}>Stop</button
->
+> -->
 
 <div class="flex gap-10">
 	<select
@@ -75,6 +74,7 @@
 		{/if}
 		<Cell
 			date={day}
+			cellDate={date.getCellDate(day)}
 			isToday={date.currentDay === day &&
 				date.currentMonth === date.selectedMonth &&
 				date.currentYear === date.selectedYear}

@@ -24,10 +24,6 @@
 		todoItem = { name: '', done: false, deadline: 0, labels: [] };
 		modal.close();
 	}
-
-	onMount(async () => {
-		todo.loadFromDB();
-	});
 </script>
 
 {#snippet createModal()}

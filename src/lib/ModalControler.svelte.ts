@@ -12,8 +12,6 @@ class ModalControler {
       throw new Error('Content is required');
     }
 
-    console.log('openModal', content, header, footer, props);
-
     this.content = content;
     this.header = header ?? null;
     this.footer = footer ?? null;

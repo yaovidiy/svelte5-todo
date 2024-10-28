@@ -2,6 +2,8 @@
 	import '../app.css';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Toasts from '$lib/components/ui/Toasts.svelte';
+	import { todo } from '$lib/TodoControler.svelte';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
@@ -14,6 +16,10 @@
 		}
 
 		document.documentElement.dataset.theme = 'emerald';
+	});
+
+	onMount(async () => {
+		todo.loadFromDB();
 	});
 </script>
 

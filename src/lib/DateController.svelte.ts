@@ -32,6 +32,10 @@ export class DateController {
     this.selectedYear = year;
   }
 
+  getCellDate(day: number) {
+    return new Date(this.selectedYear, this.selectedMonth, day);
+  }
+
   getSelectedDate() {
     return new Date(this.selectedYear, this.selectedMonth, this.selectedDay);
   }
